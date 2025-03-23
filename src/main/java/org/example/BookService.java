@@ -1,6 +1,7 @@
 package org.example;
 
 import java.util.List;
+import java.util.Optional;
 
 public class BookService {
     private final DAO<Book> bookDAO;
@@ -13,11 +14,11 @@ public class BookService {
         bookDAO.persist(book);
     }
 
-    Book findById(Integer id) {
+    Optional<Book> findById(Integer id) {
         return bookDAO.findById(id);
     }
 
-    List<Book> findAll() {
+    Optional<List<Book>> findAll() {
         return bookDAO.findAll();
     }
 

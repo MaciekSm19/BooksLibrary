@@ -6,7 +6,7 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        BookService service = new BookService(new DAODB());
+        BookService service = new BookService(new DAODataBase());
 
         List<Book> books = service.findAll();
         System.out.println("Books database:");

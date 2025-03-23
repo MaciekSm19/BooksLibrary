@@ -10,21 +10,21 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 
 import java.util.List;
 
-public class DAODB implements DAO<Book> {
-    private SessionFactory sessionFactory;
-    private Session session;
-    private Transaction transaction;
+public class DAODataBase implements DAO<Book> {
+    private final SessionFactory sessionFactory = getSessionFactory();
+    private final Session session = sessionFactory.openSession();
+    private final Transaction transaction = session.beginTransaction();
 
     @Override
     public void persist(Book entity) {
-        openSessionWithTransaction().persist(entity);
+        session.persist(entity);
         closeSessionWithTransaction();
     }
 
     @Override
     public Book findById(Integer id) {
         String hql = "FROM Book B WHERE B.id = " + id;
-        List<Book> books = openSession().createQuery(hql, Book.class).list();
+        List<Book> books = session.createQuery(hql, Book.class).list();
 
         closeSession();
         return books.getFirst();
@@ -33,20 +33,20 @@ public class DAODB implements DAO<Book> {
     @Override
     public List<Book> findAll() {
         String hql = "FROM Book";
-        List<Book> books = openSession().createQuery(hql, Book.class).list();
+        List<Book> books = session.createQuery(hql, Book.class).list();
         closeSession();
         return books;
     }
 
     @Override
     public void update(Book entity) {
-        openSessionWithTransaction().merge(entity);
+        session.merge(entity);
         closeSessionWithTransaction();
     }
 
     @Override
     public void delete(Book entity) {
-        openSessionWithTransaction().remove(entity);
+        session.remove(entity);
         closeSessionWithTransaction();
     }
 
@@ -60,18 +60,6 @@ public class DAODB implements DAO<Book> {
         StandardServiceRegistry standardServiceRegistry = new StandardServiceRegistryBuilder().configure("hibernate.cfg.xml").build();
         Metadata metadata = new MetadataSources(standardServiceRegistry).getMetadataBuilder().build();
         return metadata.buildSessionFactory();
-    }
-
-    private Session openSession() {
-        sessionFactory = getSessionFactory();
-        session = sessionFactory.openSession();
-        return session;
-    }
-
-    private Session openSessionWithTransaction() {
-        openSession();
-        transaction = session.beginTransaction();
-        return session;
     }
 
     private void closeSession() {

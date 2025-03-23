@@ -6,11 +6,9 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        BookService service = new BookService(new DAODataBase());
+        BookService service = new BookService(new DAODatabase());
 
-        List<Book> books = service.findAll();
-        System.out.println("Books database:");
-        books.forEach(System.out::println);
+        printLibrary(service);
 
         System.out.print("Title of book: ");
         String title = scanner.nextLine();
@@ -21,17 +19,27 @@ public class Main {
         Book book = new Book(title, firstName, lastName);
         service.persist(book);
 
-        books = service.findAll();
         System.out.println("Books database after persist:");
-        books.forEach(System.out::println);
+        printLibrary(service);
 
         System.out.print("Which book do you want to delete (please insert an id): ");
         int id = scanner.nextInt();
-        Book bookToDelete = service.findById(id);
-        service.delete(bookToDelete);
+        if (service.findById(id).isPresent()) {
+            Book bookToDelete = service.findById(id).get();
+            service.delete(bookToDelete);
+        }
 
-        books = service.findAll();
         System.out.println("Books database after delete book #:" + id);
-        books.forEach(System.out::println);
+        printLibrary(service);
+    }
+
+    private static void printLibrary(BookService service) {
+        if (service.findAll().isPresent()) {
+            List<Book> books = service.findAll().get();
+            System.out.println("Books database:");
+            books.forEach(System.out::println);
+        } else {
+            System.out.println("No data to print!");
+        }
     }
 }
